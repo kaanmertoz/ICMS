@@ -1,0 +1,27 @@
+# Global
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.env
+.vscode/
+*.user
+*.suo
+
+# Frontend
+dist/
+build/
+*.local
+
+# ASP.NET Core
+bin/
+obj/
+.vs/
+*.db
+*.sqlite
+appsettings.Development.json
+appsettings.Local.json
+
+# IDE
+.idea/
+.history/
