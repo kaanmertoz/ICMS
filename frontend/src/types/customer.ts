@@ -1,11 +1,16 @@
 export enum InsuranceType {
-    HEALTH = 'health',
-    LIFE = 'life',
-    PROPERTY = 'property',
-    VEHICLE = 'vehicle'
-}
-
-export interface Customer {
+    HEALTH = "health",
+    LIFE = "life",
+    PROPERTY = "property",
+    VEHICLE = "vehicle",
+  }
+  
+  export type CustomerStatus = "active" | "pending" | "inactive";
+  
+  /**
+   * Mock veride kullanılan müşteri tipi (id string olabilir)
+   */
+  export interface Customer {
     id: string;
     firstName: string;
     lastName: string;
@@ -13,27 +18,36 @@ export interface Customer {
     phone: string;
     address: string;
     insuranceType: InsuranceType;
-    status: 'active' | 'pending' | 'inactive';
+    status: CustomerStatus;
     policyNumber?: string;
     dateOfBirth?: string;
     createdAt?: string;
     updatedAt?: string;
-}
-
-export interface CustomerFormData {
+  }
+  
+  /**
+   * Formdan çıkan veri yapısı (frontend odaklı)
+   */
+  export interface CustomerFormData {
     firstName: string;
     lastName: string;
     email: string;
     phone: string;
     address: string;
     insuranceType: InsuranceType;
-    status: 'active' | 'pending' | 'inactive';
-}
-
-export interface CustomerFilters {
+    status: CustomerStatus;
+    dateOfBirth: string;
+    insuranceCompanyId: number;
+  }
+  
+  /**
+   * Filtreleme işlemlerinde kullanılan yapı
+   */
+  export interface CustomerFilters {
     search?: string;
     insuranceType?: InsuranceType;
-    status?: 'active' | 'pending' | 'inactive';
-    sortBy?: 'name' | 'email' | 'status';
-    sortOrder?: 'asc' | 'desc';
-} 
+    status?: CustomerStatus;
+    sortBy?: "name" | "email" | "status";
+    sortOrder?: "asc" | "desc";
+  }
+  

@@ -3,29 +3,32 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class Customer
+namespace ICMS_Backend.Models
 {
-    public int CustomerId { get; set; }
+    public class Customer
+    {
+        public int CustomerId { get; set; }
 
-    [Required]
-    public string FullName { get; set; }
+        [Required]
+        public string FullName { get; set; }
 
-    public DateTime DateOfBirth { get; set; }
+        public DateTime DateOfBirth { get; set; }
 
-    [EmailAddress]
-    public string Email { get; set; }
+        [EmailAddress]
+        public string Email { get; set; }
 
-    [Phone]
-    public string PhoneNumber { get; set; }
+        [Phone]
+        public string PhoneNumber { get; set; }
 
-    public string Address { get; set; }
+        public string Address { get; set; }
 
-    [ForeignKey("InsuranceCompany")]
-    public int InsuranceCompanyId { get; set; }
+        [ForeignKey("InsuranceCompany")]
+        public int InsuranceCompanyId { get; set; }
 
-    public InsuranceCompany InsuranceCompany { get; set; }
+        public InsuranceCompany InsuranceCompany { get; set; }
 
-    public ICollection<Policy> Policies { get; set; }
+        public ICollection<Policy> Policies { get; set; }
 
-    public ICollection<Payment> Payments { get; set; }
+        public ICollection<Payment> Payments { get; set; }
+    }
 }

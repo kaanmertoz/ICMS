@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Container } from '@mui/material';
 import { Header } from './Header';
 import { Routes, Route } from 'react-router-dom';
-import { CustomersPage } from '../../pages/CustomersPage';
+import CustomersPage from '../../pages/CustomersPage';
 
 export const Layout: React.FC = () => {
   return (

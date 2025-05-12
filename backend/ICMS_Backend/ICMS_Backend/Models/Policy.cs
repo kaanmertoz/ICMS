@@ -3,24 +3,27 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class Policy
+namespace ICMS_Backend.Models
 {
-    public int PolicyId { get; set; }
+    public class Policy
+    {
+        public int PolicyId { get; set; }
 
-    [Required]
-    public string PolicyNumber { get; set; }
+        [Required]
+        public string PolicyNumber { get; set; }
 
-    public DateTime StartDate { get; set; }
+        public DateTime StartDate { get; set; }
 
-    public DateTime EndDate { get; set; }
+        public DateTime EndDate { get; set; }
 
-    [Range(0, double.MaxValue)]
-    public decimal PremiumAmount { get; set; }
+        [Range(0, double.MaxValue)]
+        public decimal PremiumAmount { get; set; }
 
-    [ForeignKey("Customer")]
-    public int CustomerId { get; set; }
+        [ForeignKey("Customer")]
+        public int CustomerId { get; set; }
 
-    public Customer Customer { get; set; }
+        public Customer Customer { get; set; }
 
-    public ICollection<Claim> Claims { get; set; }
+        public ICollection<Claim> Claims { get; set; }
+    }
 }
