@@ -7,6 +7,8 @@ export interface BackendCustomer {
   address: string;
   dateOfBirth: string;
   insuranceCompanyId: number;
+  insuranceType: string;
+  status: string;
 }
 
 /**
@@ -20,5 +22,9 @@ export const toBackendCustomer = (form: CustomerFormData): BackendCustomer => {
     address: form.address,
     dateOfBirth: form.dateOfBirth || "1990-01-01", // geçici varsayılan
     insuranceCompanyId: form.insuranceCompanyId,
+    insuranceType: form.insuranceType,
+    status: form.status,
   };
 };
+
+

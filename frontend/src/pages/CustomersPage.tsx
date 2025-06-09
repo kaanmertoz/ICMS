@@ -1,65 +1,196 @@
-import React, { useEffect, useState } from "react";
-import CustomerForm from "../components/customer/CustomerForm";
+import React, { useState, useEffect, useCallback } from "react";
 import {
-  createCustomer,
-  getCustomers,
-} from "../services/customerService";
+  Container,
+  Box,
+  Typography,
+  AppBar,
+  Toolbar,
+  IconButton,
+  Tooltip,
+  Avatar,
+  Badge,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Snackbar,
+  Alert,
+  CircularProgress,
+  Stack,
+} from "@mui/material";
+import {
+  LightMode as LightModeIcon,
+  DarkMode as DarkModeIcon,
+  Notifications as NotificationsIcon,
+  Person as PersonIcon,
+  Add as AddIcon,
+  Business as BusinessIcon,
+} from "@mui/icons-material";
+import CustomerForm from "../components/customer/CustomerForm";
+import { useThemeContext } from "../context/ThemeContext";
 import { BackendCustomer } from "../mappers/customerMapper";
+import { customerApi } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
-const CustomersPage: React.FC = () => {
+const CustomerPage = () => {
+  const { mode, toggleTheme } = useThemeContext();
   const [isLoading, setIsLoading] = useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
   const [customers, setCustomers] = useState<BackendCustomer[]>([]);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success" as "success" | "error",
+  });
+
+  const navigate = useNavigate();
+
+  const showSnackbar = (message: string, severity: "success" | "error") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const fetchCustomers = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const data = await customerApi.getCustomers();
+      setCustomers(data);
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      showSnackbar("Müşteriler yüklenemedi", "error");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCustomers();
+  }, [fetchCustomers]);
 
   const handleSubmit = async (data: BackendCustomer) => {
     try {
       setIsLoading(true);
-      await createCustomer(data);
-      alert("Müşteri başarıyla eklendi!");
-      await fetchCustomers();
+      await customerApi.createCustomer(data);
+      showSnackbar("Müşteri başarıyla eklendi", "success");
+      fetchCustomers();
+      setOpenDialog(false);
     } catch (error) {
       console.error("Müşteri eklenemedi:", error);
-      alert("Bir hata oluştu.");
+      showSnackbar("Müşteri eklenirken hata oluştu", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const fetchCustomers = async () => {
-    try {
-      const response = await getCustomers();
-      setCustomers(response.data);
-    } catch (error) {
-      console.error("Müşteri listesi alınamadı:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
-
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Sigorta Müşteri Yönetimi</h2>
-      <CustomerForm
-        onSubmit={handleSubmit}
-        onCancel={() => {}}
-        isLoading={isLoading}
-      />
+    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+      <AppBar position="static" color="default" elevation={1}>
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Insurance CMS
+          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+            <Tooltip title="Tema Değiştir">
+              <IconButton onClick={toggleTheme} color="inherit">
+                {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Bildirimler">
+              <IconButton color="inherit">
+                <Badge badgeContent={2} color="error">
+                  <NotificationsIcon />
+                </Badge>
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Profil">
+              <IconButton color="inherit">
+                <Avatar sx={{ width: 32, height: 32 }}>
+                  <PersonIcon />
+                </Avatar>
+              </IconButton>
+            </Tooltip>
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-      <h3 style={{ marginTop: "3rem" }}>Müşteri Listesi</h3>
-      {customers.length === 0 ? (
-        <p>Henüz müşteri eklenmedi.</p>
-      ) : (
-        <ul>
-          {customers.map((customer, index) => (
-            <li key={index}>
-              {customer.fullName} — {customer.email}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
+      <Container maxWidth="md" sx={{ py: 4, flex: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            mb: 4,
+          }}
+        >
+          <Typography variant="h4" fontWeight="bold">
+            Müşteri Listesi
+          </Typography>
+          <Stack direction="row" spacing={2}>
+            <Button
+              variant="outlined"
+              startIcon={<BusinessIcon />}
+              onClick={() => navigate("/companies")}
+            >
+              Şirketler
+            </Button>
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenDialog(true)}
+            >
+              Müşteri Ekle
+            </Button>
+          </Stack>
+        </Box>
+
+        {isLoading ? (
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <CircularProgress />
+          </Box>
+        ) : customers.length === 0 ? (
+          <Typography>Müşteri bulunamadı.</Typography>
+        ) : (
+          <Box component="ul" sx={{ pl: 3 }}>
+            {customers.map((customer, i) => (
+              <li key={i}>
+                <strong>{customer.fullName}</strong> — {customer.email}
+              </li>
+            ))}
+          </Box>
+        )}
+      </Container>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
+        <DialogTitle>Yeni Müşteri Ekle</DialogTitle>
+        <DialogContent>
+          <CustomerForm
+            onSubmit={handleSubmit}
+            onCancel={() => setOpenDialog(false)}
+            isLoading={isLoading}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)}>İptal</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          severity={snackbar.severity}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 };
 
-export default CustomersPage;
+export default CustomerPage;

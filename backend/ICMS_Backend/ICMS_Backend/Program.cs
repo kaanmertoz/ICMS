@@ -1,29 +1,30 @@
-using ICMS_Backend.Data;
+ï»¿using ICMS_Backend.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Veritabanı bağlantısı
+// VeritabanÄ± baÄŸlantÄ±sÄ±
 builder.Services.AddDbContext<InsuranceDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Controller'lar + JSON döngüleri engelle
+// Controller'lar + JSON dÃ¶ngÃ¼leri engelle
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-    options.JsonSerializerOptions.PropertyNamingPolicy = null; // (opsiyonel, PascalCase için)
+    options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
 
 // Swagger servisleri
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// ğŸ”§ CORS politikasÄ±
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // veya React/Vite portu kaçsa o
+        policy.WithOrigins("http://localhost:3000")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -31,13 +32,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Geliştirme ortamı için Swagger
+// ğŸŒ CORS'u burada aktif et
+app.UseCors(); // varsayÄ±lan policy kullanÄ±ldÄ±ÄŸÄ± iÃ§in parametre gerekmez
+
+// Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 
 // Middleware pipeline
 //app.UseHttpsRedirection();

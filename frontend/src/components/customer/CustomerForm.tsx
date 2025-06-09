@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Button,
@@ -9,12 +9,18 @@ import {
 } from "@mui/material";
 import { InsuranceType, CustomerFormData } from "../../types/customer";
 import { toBackendCustomer, BackendCustomer } from "../../mappers/customerMapper";
+import axios from "axios";
 
 interface CustomerFormProps {
   onSubmit: (data: BackendCustomer) => void;
   onCancel: () => void;
   initialData?: CustomerFormData;
   isLoading?: boolean;
+}
+
+interface InsuranceCompany {
+  insuranceCompanyId: number;
+  name: string;
 }
 
 const insuranceTypes = Object.values(InsuranceType);
@@ -30,6 +36,26 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
   onCancel,
   isLoading,
 }) => {
+  const [companies, setCompanies] = useState<InsuranceCompany[]>([]);
+  const [loadingCompanies, setLoadingCompanies] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      try {
+        const response = await axios.get<InsuranceCompany[]>(
+          "http://localhost:5022/api/insurancecompanies"
+        );
+        setCompanies(response.data);
+      } catch (error) {
+        console.error("Şirket listesi alınamadı:", error);
+      } finally {
+        setLoadingCompanies(false);
+      }
+    };
+
+    fetchCompanies();
+  }, []);
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -130,14 +156,22 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             select
             label="Insurance Company"
             name="insuranceCompanyId"
-            defaultValue={initialData?.insuranceCompanyId || 1}
+            defaultValue={initialData?.insuranceCompanyId || ""}
             required
             variant="outlined"
-            disabled={isLoading}
+            disabled={isLoading || loadingCompanies}
           >
-            <MenuItem value={1}>Anadolu Sigorta</MenuItem>
-            <MenuItem value={2}>Allianz</MenuItem>
-            <MenuItem value={3}>AXA</MenuItem>
+            {loadingCompanies ? (
+              <MenuItem disabled>Yükleniyor...</MenuItem>
+            ) : companies.length === 0 ? (
+              <MenuItem disabled>Şirket bulunamadı</MenuItem>
+            ) : (
+              companies.map((company) => (
+                <MenuItem key={company.insuranceCompanyId} value={company.insuranceCompanyId}>
+                  {company.name}
+                </MenuItem>
+              ))
+            )}
           </TextField>
         </Grid>
         <Grid item xs={12} sm={6}>
