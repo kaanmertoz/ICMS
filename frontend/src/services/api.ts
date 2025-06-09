@@ -1,7 +1,7 @@
 import axios from "axios";
 import { BackendCustomer } from "../mappers/customerMapper";
 
-const baseURL = "http://localhost:7089/api/customers";
+const baseURL = "http://localhost:5022/api/customers";
 
 export const customerApi = {
   createCustomer: async (data: BackendCustomer) => {

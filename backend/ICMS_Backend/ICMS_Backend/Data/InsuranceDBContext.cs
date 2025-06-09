@@ -1,4 +1,5 @@
 ﻿namespace ICMS_Backend.Data;
+using ICMS_Backend.Models;
 using Microsoft.EntityFrameworkCore;
 
 public class InsuranceDbContext : DbContext

@@ -18,6 +18,6 @@ namespace ICMS_Backend.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        public ICollection<Customer> Customers { get; set; }
+        public ICollection<Customer> Customers { get; set; } = new List<Customer>();
     }
 }
