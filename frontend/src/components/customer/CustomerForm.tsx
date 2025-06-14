@@ -8,11 +8,14 @@ import {
   Grid,
 } from "@mui/material";
 import { InsuranceType, CustomerFormData } from "../../types/customer";
-import { toBackendCustomer, BackendCustomer } from "../../mappers/customerMapper";
+import {
+  toBackendCustomer,
+  BackendCustomer,
+} from "../../mappers/customerMapper";
 import axios from "axios";
 
 interface CustomerFormProps {
-  onSubmit: (data: BackendCustomer) => void;
+  onSubmit: (data: CustomerFormData) => void | Promise<void>;
   onCancel: () => void;
   initialData?: CustomerFormData;
   isLoading?: boolean;
@@ -56,7 +59,7 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     fetchCompanies();
   }, []);
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
@@ -73,7 +76,8 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
     };
 
     const backendData = toBackendCustomer(data);
-    onSubmit(backendData);
+
+    await onSubmit(data);
   };
 
   return (
@@ -167,7 +171,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
               <MenuItem disabled>Şirket bulunamadı</MenuItem>
             ) : (
               companies.map((company) => (
-                <MenuItem key={company.insuranceCompanyId} value={company.insuranceCompanyId}>
+                <MenuItem
+                  key={company.insuranceCompanyId}
+                  value={company.insuranceCompanyId}
+                >
                   {company.name}
                 </MenuItem>
               ))
@@ -211,7 +218,9 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
           </TextField>
         </Grid>
         <Grid item xs={12}>
-          <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}>
+          <Box
+            sx={{ display: "flex", gap: 2, justifyContent: "flex-end", mt: 2 }}
+          >
             <Button
               variant="outlined"
               disabled={isLoading}
@@ -228,8 +237,10 @@ const CustomerForm: React.FC<CustomerFormProps> = ({
             >
               {isLoading ? (
                 <CircularProgress size={24} color="inherit" />
+              ) : initialData ? (
+                "Update Customer"
               ) : (
-                `${initialData ? "Update" : "Create"} Customer`
+                "Create Customer"
               )}
             </Button>
           </Box>

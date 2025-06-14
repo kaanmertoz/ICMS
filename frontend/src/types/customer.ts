@@ -29,6 +29,7 @@ export enum InsuranceType {
    * Formdan çıkan veri yapısı (frontend odaklı)
    */
   export interface CustomerFormData {
+    customerId?: string;
     firstName: string;
     lastName: string;
     email: string;

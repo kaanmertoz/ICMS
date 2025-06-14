@@ -14,7 +14,6 @@ public class InsuranceDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Optional: Fluent API ile ek yapılandırmalar yapılabilir
         base.OnModelCreating(modelBuilder);
     }
 }

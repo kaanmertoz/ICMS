@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BackendCustomer } from "../mappers/customerMapper";
 import { InsuranceCompany } from "../types/insuranceCompany";
+import { toFrontendCustomer } from "../mappers/customerMapper";
 
 const baseURL = "http://localhost:5022/api/customers";
 const BASE_URL = "http://localhost:5022/api/insurancecompanies";
@@ -20,7 +21,7 @@ export const customerApi = {
 
   getCustomers: async () => {
     const response = await axios.get(baseURL);
-    return response.data;
+    return response.data.map(toFrontendCustomer);
   },
 };
 

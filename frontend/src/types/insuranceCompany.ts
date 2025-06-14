@@ -1,5 +1,5 @@
 export interface InsuranceCompany {
-    insuranceCompanyId: number;
+    insuranceCompanyId?: number;
     name: string;
     address: string;
     phoneNumber: string;

@@ -16,7 +16,6 @@ namespace ICMS_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Claims
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Claim>>> GetClaims()
         {
@@ -26,7 +25,6 @@ namespace ICMS_Backend.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Claims/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Claim>> GetClaim(int id)
         {
@@ -41,7 +39,6 @@ namespace ICMS_Backend.Controllers
             return claim;
         }
 
-        // POST: api/Claims
         [HttpPost]
         public async Task<ActionResult<Claim>> PostClaim(Claim claim)
         {
@@ -51,7 +48,6 @@ namespace ICMS_Backend.Controllers
             return CreatedAtAction(nameof(GetClaim), new { id = claim.ClaimId }, claim);
         }
 
-        // PUT: api/Claims/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutClaim(int id, Claim claim)
         {
@@ -75,7 +71,6 @@ namespace ICMS_Backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Claims/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteClaim(int id)
         {

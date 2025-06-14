@@ -16,7 +16,6 @@ namespace ICMS_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Policies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Policy>>> GetPolicies()
         {
@@ -25,7 +24,6 @@ namespace ICMS_Backend.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Policies/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Policy>> GetPolicy(int id)
         {
@@ -39,7 +37,6 @@ namespace ICMS_Backend.Controllers
             return policy;
         }
 
-        // POST: api/Policies
         [HttpPost]
         public async Task<ActionResult<Policy>> PostPolicy(Policy policy)
         {
@@ -49,7 +46,6 @@ namespace ICMS_Backend.Controllers
             return CreatedAtAction(nameof(GetPolicy), new { id = policy.PolicyId }, policy);
         }
 
-        // PUT: api/Policies/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPolicy(int id, Policy policy)
         {
@@ -73,7 +69,6 @@ namespace ICMS_Backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Policies/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePolicy(int id)
         {

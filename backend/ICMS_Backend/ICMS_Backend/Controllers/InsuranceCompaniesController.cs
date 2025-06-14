@@ -16,14 +16,12 @@ namespace ICMS_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/InsuranceCompanies
         [HttpGet]
         public async Task<ActionResult<IEnumerable<InsuranceCompany>>> GetInsuranceCompanies()
         {
             return await _context.InsuranceCompanies.ToListAsync();
         }
 
-        // GET: api/InsuranceCompanies/5
         [HttpGet("{id}")]
         public async Task<ActionResult<InsuranceCompany>> GetInsuranceCompany(int id)
         {
@@ -35,7 +33,6 @@ namespace ICMS_Backend.Controllers
             return company;
         }
 
-        // POST: api/InsuranceCompanies
         [HttpPost]
         public async Task<ActionResult<InsuranceCompany>> PostInsuranceCompany(InsuranceCompany company)
         {
@@ -45,7 +42,6 @@ namespace ICMS_Backend.Controllers
             return CreatedAtAction(nameof(GetInsuranceCompany), new { id = company.InsuranceCompanyId }, company);
         }
 
-        // PUT: api/InsuranceCompanies/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutInsuranceCompany(int id, InsuranceCompany company)
         {
@@ -69,7 +65,6 @@ namespace ICMS_Backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/InsuranceCompanies/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteInsuranceCompany(int id)
         {

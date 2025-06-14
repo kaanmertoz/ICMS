@@ -16,7 +16,6 @@ namespace ICMS_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Customers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
@@ -25,7 +24,6 @@ namespace ICMS_Backend.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Customers/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
@@ -39,7 +37,6 @@ namespace ICMS_Backend.Controllers
             return customer;
         }
 
-        // POST: api/Customers
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
@@ -49,7 +46,6 @@ namespace ICMS_Backend.Controllers
             return CreatedAtAction(nameof(GetCustomer), new { id = customer.CustomerId }, customer);
         }
 
-        // PUT: api/Customers/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
@@ -73,7 +69,6 @@ namespace ICMS_Backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Customers/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {

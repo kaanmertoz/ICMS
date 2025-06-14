@@ -16,7 +16,6 @@ namespace ICMS_Backend.Controllers
             _context = context;
         }
 
-        // GET: api/Payments
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Payment>>> GetPayments()
         {
@@ -25,7 +24,6 @@ namespace ICMS_Backend.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Payments/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Payment>> GetPayment(int id)
         {
@@ -39,7 +37,6 @@ namespace ICMS_Backend.Controllers
             return payment;
         }
 
-        // POST: api/Payments
         [HttpPost]
         public async Task<ActionResult<Payment>> PostPayment(Payment payment)
         {
@@ -49,7 +46,6 @@ namespace ICMS_Backend.Controllers
             return CreatedAtAction(nameof(GetPayment), new { id = payment.PaymentId }, payment);
         }
 
-        // PUT: api/Payments/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutPayment(int id, Payment payment)
         {
@@ -73,7 +69,6 @@ namespace ICMS_Backend.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Payments/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePayment(int id)
         {

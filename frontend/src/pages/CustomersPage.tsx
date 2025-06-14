@@ -3,12 +3,6 @@ import {
   Container,
   Box,
   Typography,
-  AppBar,
-  Toolbar,
-  IconButton,
-  Tooltip,
-  Avatar,
-  Badge,
   Button,
   Dialog,
   DialogTitle,
@@ -20,24 +14,24 @@ import {
   Stack,
 } from "@mui/material";
 import {
-  LightMode as LightModeIcon,
-  DarkMode as DarkModeIcon,
-  Notifications as NotificationsIcon,
-  Person as PersonIcon,
   Add as AddIcon,
+  Edit as EditIcon,
+  Delete as DeleteIcon,
   Business as BusinessIcon,
 } from "@mui/icons-material";
 import CustomerForm from "../components/customer/CustomerForm";
 import { useThemeContext } from "../context/ThemeContext";
-import { BackendCustomer } from "../mappers/customerMapper";
 import { customerApi } from "../services/api";
+import { CustomerFormData } from "../types/customer";
+import { BackendCustomer, toCustomerFormData, toBackendCustomer } from "../mappers/customerMapper";
 import { useNavigate } from "react-router-dom";
 
 const CustomerPage = () => {
-  const { mode, toggleTheme } = useThemeContext();
+  const { toggleTheme } = useThemeContext();
   const [isLoading, setIsLoading] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [customers, setCustomers] = useState<BackendCustomer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<BackendCustomer | null>(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -57,7 +51,7 @@ const CustomerPage = () => {
       setCustomers(data);
     } catch (error) {
       console.error("Error fetching customers:", error);
-      showSnackbar("Müşteriler yüklenemedi", "error");
+      showSnackbar("Customers could not be fetched", "error");
     } finally {
       setIsLoading(false);
     }
@@ -67,52 +61,48 @@ const CustomerPage = () => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  const handleSubmit = async (data: BackendCustomer) => {
+  const handleSubmit = async (formData: CustomerFormData) => {
     try {
       setIsLoading(true);
-      await customerApi.createCustomer(data);
-      showSnackbar("Müşteri başarıyla eklendi", "success");
+      const backendData = toBackendCustomer(formData);
+
+      if (formData.customerId) {
+        await customerApi.updateCustomer(formData.customerId, backendData);
+        showSnackbar("Customer updated successfully", "success");
+      } else {
+        await customerApi.createCustomer(backendData);
+        showSnackbar("Customer added successfully", "success");
+      }
+
       fetchCustomers();
       setOpenDialog(false);
+      setSelectedCustomer(null);
     } catch (error) {
-      console.error("Müşteri eklenemedi:", error);
-      showSnackbar("Müşteri eklenirken hata oluştu", "error");
+      console.error("Error submitting customer:", error);
+      showSnackbar("An error occurred while saving the customer", "error");
     } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Insurance CMS
-          </Typography>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-            <Tooltip title="Tema Değiştir">
-              <IconButton onClick={toggleTheme} color="inherit">
-                {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Bildirimler">
-              <IconButton color="inherit">
-                <Badge badgeContent={2} color="error">
-                  <NotificationsIcon />
-                </Badge>
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Profil">
-              <IconButton color="inherit">
-                <Avatar sx={{ width: 32, height: 32 }}>
-                  <PersonIcon />
-                </Avatar>
-              </IconButton>
-            </Tooltip>
-          </Box>
-        </Toolbar>
-      </AppBar>
+  const handleEdit = (customer: BackendCustomer) => {
+    setSelectedCustomer(customer);
+    setOpenDialog(true);
+  };
 
+  const handleDelete = async (id: string) => {
+    try {
+      await customerApi.deleteCustomer(id);
+      showSnackbar("Customer deleted", "success");
+      fetchCustomers();
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      showSnackbar("Failed to delete customer", "error");
+    }
+  };
+
+  return (
+    <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <Container maxWidth="md" sx={{ py: 4, flex: 1 }}>
         <Box
           sx={{
@@ -123,22 +113,18 @@ const CustomerPage = () => {
           }}
         >
           <Typography variant="h4" fontWeight="bold">
-            Müşteri Listesi
+            Customer List
           </Typography>
           <Stack direction="row" spacing={2}>
             <Button
-              variant="outlined"
-              startIcon={<BusinessIcon />}
-              onClick={() => navigate("/companies")}
-            >
-              Şirketler
-            </Button>
-            <Button
               variant="contained"
               startIcon={<AddIcon />}
-              onClick={() => setOpenDialog(true)}
+              onClick={() => {
+                setSelectedCustomer(null);
+                setOpenDialog(true);
+              }}
             >
-              Müşteri Ekle
+              Add Customer
             </Button>
           </Stack>
         </Box>
@@ -148,12 +134,29 @@ const CustomerPage = () => {
             <CircularProgress />
           </Box>
         ) : customers.length === 0 ? (
-          <Typography>Müşteri bulunamadı.</Typography>
+          <Typography>No customers found.</Typography>
         ) : (
           <Box component="ul" sx={{ pl: 3 }}>
             {customers.map((customer, i) => (
               <li key={i}>
                 <strong>{customer.fullName}</strong> — {customer.email}
+                <Button
+                  size="small"
+                  startIcon={<EditIcon />}
+                  onClick={() => handleEdit(customer)}
+                  sx={{ ml: 2 }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="small"
+                  startIcon={<DeleteIcon />}
+                  color="error"
+                  onClick={() => handleDelete((customer as any).customerId)}
+                  sx={{ ml: 1 }}
+                >
+                  Delete
+                </Button>
               </li>
             ))}
           </Box>
@@ -161,16 +164,22 @@ const CustomerPage = () => {
       </Container>
 
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth>
-        <DialogTitle>Yeni Müşteri Ekle</DialogTitle>
+        <DialogTitle>{selectedCustomer ? "Edit Customer" : "Add New Customer"}</DialogTitle>
         <DialogContent>
           <CustomerForm
             onSubmit={handleSubmit}
-            onCancel={() => setOpenDialog(false)}
+            onCancel={() => {
+              setOpenDialog(false);
+              setSelectedCustomer(null);
+            }}
+            initialData={
+              selectedCustomer ? toCustomerFormData(selectedCustomer) : undefined
+            }
             isLoading={isLoading}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>İptal</Button>
+          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
         </DialogActions>
       </Dialog>
 
